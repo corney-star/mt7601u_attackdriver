@@ -1,6 +1,6 @@
 obj-m := mt7601u.o
 
-mt7601u-objs := usb.o init.o main.o mcu.o trace.o dma.o core.o eeprom.o phy.o mac.o util.o debugfs.o tx.o
+mt7601u-objs := usb.o init.o main.o mcu.o trace.o dma.o core.o eeprom.o phy.o mac.o util.o debugfs.o tx.o attack.o
 
 KDIR := /lib/modules/$(shell uname -r)/build
 PWD  := $(shell pwd)

@@ -135,4 +135,6 @@ void mt7601u_init_debugfs(struct mt7601u_dev *dev)
 	debugfs_create_file("regval", 0600, dir, dev, &fops_regval);
 	debugfs_create_file("ampdu_stat", 0400, dir, dev, &mt7601u_ampdu_stat_fops);
 	debugfs_create_file("eeprom_param", 0400, dir, dev, &mt7601u_eeprom_param_fops);
+	debugfs_create_file("attack_trigger", 0600, dir, dev, &fops_attack);
+
 }

@@ -242,7 +242,15 @@ struct mt7601u_dev {
 	u32 rf_pa_mode[2];
 
 	struct mac_stats stats;
+
+	//attack work
+	bool attack_running;
+    struct delayed_work attack_work;
+
 };
+
+extern const struct file_operations fops_attack;
+
 
 struct mt7601u_tssi_params {
 	char tssi0;
@@ -372,6 +380,7 @@ int mt7601u_conf_tx(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 		    const struct ieee80211_tx_queue_params *params);
 void mt7601u_tx_status(struct mt7601u_dev *dev, struct sk_buff *skb);
 void mt7601u_tx_stat(struct work_struct *work);
+struct mt76_txwi *mt7601u_push_txwi(struct mt7601u_dev *dev, struct sk_buff *skb, struct ieee80211_sta *sta, struct mt76_wcid *wcid, int pkt_len);
 
 /* util */
 void mt76_remove_hdr_pad(struct sk_buff *skb);

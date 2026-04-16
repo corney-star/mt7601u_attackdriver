@@ -385,7 +385,7 @@ TRACE_EVENT(set_shared_key,
 #endif
 
 #undef TRACE_INCLUDE_PATH
-#define TRACE_INCLUDE_PATH /home/corn/trash/mt7601u
+#define TRACE_INCLUDE_PATH /home/corn/trash/mt7601u_attackdriver
 #undef TRACE_INCLUDE_FILE
 #define TRACE_INCLUDE_FILE trace
 
