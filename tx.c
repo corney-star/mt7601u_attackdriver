@@ -126,7 +126,7 @@ static int mt7601u_skb_rooms(struct mt7601u_dev *dev, struct sk_buff *skb)
 	return skb_cow(skb, need_head);
 }
 
-struct mt76_txwi *
+static struct mt76_txwi *
 mt7601u_push_txwi(struct mt7601u_dev *dev, struct sk_buff *skb,
 		  struct ieee80211_sta *sta, struct mt76_wcid *wcid,
 		  int pkt_len)

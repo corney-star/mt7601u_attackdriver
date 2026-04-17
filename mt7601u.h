@@ -380,7 +380,6 @@ int mt7601u_conf_tx(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 		    const struct ieee80211_tx_queue_params *params);
 void mt7601u_tx_status(struct mt7601u_dev *dev, struct sk_buff *skb);
 void mt7601u_tx_stat(struct work_struct *work);
-struct mt76_txwi *mt7601u_push_txwi(struct mt7601u_dev *dev, struct sk_buff *skb, struct ieee80211_sta *sta, struct mt76_wcid *wcid, int pkt_len);
 
 /* util */
 void mt76_remove_hdr_pad(struct sk_buff *skb);
