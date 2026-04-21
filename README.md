@@ -2,7 +2,7 @@
 net attack by mt7601u driver
 for study ONLY
 
-一.CTS重放攻击（单信道默认为1：2412Mhz）
+一.CTS多信道重放攻击
 
 1.开启监听模式：
     ip link set <dev> down
